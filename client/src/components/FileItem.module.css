@@ -1,0 +1,52 @@
+.fileItem>div {
+  border-radius: 0.5rem;
+  transition: background-color 240ms ease-out;
+}
+
+.fileItem a {
+  text-decoration: none;
+}
+
+.fileItem>div:hover {
+  background-color: var(--secondary-700);
+}
+
+.fileItem:hover + .fileItem, .fileItem + .fileItem:hover {
+  border-top-color: transparent;
+}
+
+.fileItem+.fileItem {
+  border-top: 1px solid var(--secondary-700);
+  transition: border-top-color 240ms ease-in;
+}
+
+.filename {
+  width: 30%;
+  flex: 1;
+}
+
+.fileSize {
+  width: 5rem;
+  text-align: end;
+  margin: 0 1.3rem;
+}
+
+.date {
+  width: 6rem;
+}
+
+.action {
+  opacity: 0;
+  transition: opacity 240ms ease-out;
+  text-align: end;
+}
+
+.fileItem:hover .action {
+  opacity: 1;
+}
+
+.action button {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}

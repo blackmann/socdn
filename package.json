@@ -1,0 +1,20 @@
+{
+  "name": "socdn",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "dev:client": "yarn workspace client run dev",
+    "start:server": "yarn workspace server run start",
+    "build:client": "yarn workspace client run build",
+    "copy-client": "cp -R client/dist server/admin"
+  },
+  "keywords": [],
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "author": "",
+  "license": "ISC"
+}

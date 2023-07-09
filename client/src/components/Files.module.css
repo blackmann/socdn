@@ -1,0 +1,21 @@
+.header {
+  font-weight: 700;
+}
+
+.uploadPreview {
+  border-radius: 0.5rem;
+}
+
+.toUploadTitle {
+  font-weight: 700;
+}
+
+.uploadItem + .uploadItem {
+  border-top: 1px solid var(--secondary-700);
+}
+
+.removeButton {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}
