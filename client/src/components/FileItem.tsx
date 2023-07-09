@@ -1,13 +1,19 @@
 import clsx from 'clsx'
 import styles from './FileItem.module.css'
+import { F } from '../lib/files'
+import { Link } from 'react-router-dom'
 
-function FileItem() {
+interface Props {
+  file: F
+}
+
+function FileItem({ file }: Props) {
   return (
     <div className={styles.fileItem}>
       <div className="d-flex py-2 px-2">
-        <a href="/" className={styles.filename}>
-          garage.blend
-        </a>
+        <Link to={file.name} className={styles.filename}>
+          {file.name}
+        </Link>
 
         <span className={clsx('text-secondary', styles.fileSize)}>23Mb</span>
 

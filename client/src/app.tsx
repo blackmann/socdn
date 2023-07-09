@@ -1,3 +1,4 @@
+import { Route, Routes } from 'react-router-dom'
 import Files from './components/Files'
 import Header from './components/Header'
 import Nav from './components/Nav'
@@ -24,7 +25,13 @@ export function App() {
         </div>
 
         <div className="col-md-7">
-          <Files />
+          <Routes>
+            <Route element={<Files />} path=":folder" />
+            <Route
+              element={<div>Select a folder to get started</div>}
+              path=""
+            />
+          </Routes>
         </div>
       </div>
     </div>

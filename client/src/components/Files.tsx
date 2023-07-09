@@ -4,6 +4,9 @@ import styles from './Files.module.css'
 import Remove from '../svgs/Remove'
 import Upload from '../svgs/Upload'
 import toUpload, { clearFiles, removeFile } from '../lib/to-upload'
+import React from 'preact/compat'
+import { useLocation, useParams } from 'react-router-dom'
+import files, { getFiles } from '../lib/files'
 
 function FilesToUpload() {
   return (
@@ -12,7 +15,9 @@ function FilesToUpload() {
         <span className="text-accent">
           <Upload />
         </span>
-        <span className={styles.toUploadTitle}>{toUpload.value.length} selected</span>
+        <span className={styles.toUploadTitle}>
+          {toUpload.value.length} selected
+        </span>
       </header>
 
       {toUpload.value.map((file) => (
@@ -43,7 +48,14 @@ function FilesToUpload() {
   )
 }
 
-function Files() {
+function Listing() {
+  const { folder } = useParams()
+  const folderListing = files.value[folder as string] || []
+
+  React.useEffect(() => {
+    getFiles(folder as string)
+  }, [folder])
+
   return (
     <>
       <header className={styles.header}>blends/ (23 &bull; 1.35Gig)</header>
@@ -52,12 +64,17 @@ function Files() {
       {Boolean(toUpload.value.length) && <FilesToUpload />}
 
       <div className="mt-3">
-        <FileItem />
-        <FileItem />
-        <FileItem />
+        {
+          folderListing.map((file) => (<FileItem file={file} />))
+        }
       </div>
     </>
   )
+}
+
+function Files() {
+  const { folder } = useParams()
+  return <Listing key={folder} />
 }
 
 export default Files
