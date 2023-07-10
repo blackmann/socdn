@@ -2,6 +2,10 @@ import express from 'express'
 import cors from 'cors'
 import * as mongodb from 'mongodb'
 import multer from 'multer'
+import path from 'path'
+import url from 'url'
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 const LOCAL_DB = 'mongodb://localhost:27017/socdn'
 
@@ -75,6 +79,7 @@ app.post('/files', upload.array('files'), async (req, res) => {
 
       await revisionsCollection.insertOne({
         file: f.insertedId,
+        filename: file.filename,
         version: 1,
         created_at: new Date(),
         size: file.size,
@@ -96,6 +101,7 @@ app.post('/files', upload.array('files'), async (req, res) => {
 
       await revisionsCollection.insertOne({
         file: f._id,
+        filename: file.filename,
         version: previousRevision.version + 1,
         created_at: new Date(),
         size: file.size,
@@ -108,7 +114,7 @@ app.post('/files', upload.array('files'), async (req, res) => {
   res.status(201).json(results)
 })
 
-app.use('/files/:id', async (req, res) => {
+app.get('/files/:id', async (req, res) => {
   const file = await db
     .collection('files')
     .findOne({ _id: mongodb.ObjectId.createFromHexString(req.params['id']) })
@@ -121,7 +127,7 @@ app.use('/files/:id', async (req, res) => {
   res.json({ file, revisions })
 })
 
-app.use('/folders', async (req, res) => {
+app.get('/folders', async (req, res) => {
   const aggregate = await db
     .collection('files')
     .aggregate([{ $group: { _id: '$folder' } }])
@@ -130,8 +136,39 @@ app.use('/folders', async (req, res) => {
   res.json(aggregate.map((f) => ({ name: f._id })))
 })
 
-app.use('/_/:fn', (req, res) => {
-  //
+app.get('/_/:folder/:fn', async (req, res) => {
+  const filename = req.params['fn']
+  const revision = req.query['revision']
+  const folder = req.params['folder']
+
+  const file = await db.collection('files').findOne({ folder, name: filename })
+
+  if (!file) {
+    res.sendStatus(404)
+    return
+  }
+
+  const revisionQuery = { file: file._id }
+  if (revision) {
+    revisionQuery['version'] = Number(revision)
+  }
+
+  const [rev] = await db
+    .collection('revisions')
+    .find(revisionQuery)
+    .sort({ version: -1 })
+    .limit(1)
+    .toArray()
+
+  if (!rev) {
+    res.sendStatus(404)
+    return
+  }
+
+  res.sendFile(rev.filename, {
+    root: path.join(__dirname, 'socdn_files'),
+    headers: { 'Content-Disposition': 'attachment; file="' + file.name + '"' },
+  })
 })
 
 const port = process.env.PORT || 3000

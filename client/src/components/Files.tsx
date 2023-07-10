@@ -59,10 +59,12 @@ function Listing() {
     getFiles(folder as string)
   }, [folder])
 
+  const size = folderListing.reduce((a, b) => a + b.size, 0)
+
   return (
     <>
       <header className={styles.header}>
-        blends/ <Tag>{folderListing.length} &bull; 1.35Gb</Tag>
+        {folder}/ <Tag>{folderListing.length} &bull; {humanSize(size)}</Tag>
       </header>
       <div className="text-secondary">Drag files unto page to upload</div>
 
