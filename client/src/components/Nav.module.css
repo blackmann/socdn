@@ -7,3 +7,7 @@
 .title {
   font-weight: 700;
 }
+
+.active {
+  text-decoration: underline;
+}

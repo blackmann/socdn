@@ -8,7 +8,13 @@
 }
 
 .fileItem>div:hover {
-  background-color: var(--secondary-700);
+  background-color: var(--secondary-200);
+}
+
+@media (prefers-color-scheme: dark) {
+  .fileItem>div:hover {
+    background-color: var(--secondary-700);
+  }
 }
 
 .fileItem:hover + .fileItem, .fileItem + .fileItem:hover {
@@ -16,8 +22,14 @@
 }
 
 .fileItem+.fileItem {
-  border-top: 1px solid var(--secondary-700);
+  border-top: 1px solid var(--secondary-200);
   transition: border-top-color 240ms ease-in;
+}
+
+@media (prefers-color-scheme: dark) {
+  .fileItem + .fileItem {
+    border-top-color: var(--secondary-700);
+  }
 }
 
 .filename {
@@ -39,6 +51,7 @@
   opacity: 0;
   transition: opacity 240ms ease-out;
   text-align: end;
+  width: 5rem;
 }
 
 .fileItem:hover .action {

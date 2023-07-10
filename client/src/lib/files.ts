@@ -1,9 +1,13 @@
 import { signal } from '@preact/signals'
 import req from './requests'
 
+type DateStr = string
+
 interface F {
   _id: string
   name: string
+  size: number,
+  created_at: DateStr
 }
 type FolderName = string
 

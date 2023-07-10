@@ -5,8 +5,10 @@ import Remove from '../svgs/Remove'
 import Upload from '../svgs/Upload'
 import toUpload, { clearFiles, removeFile } from '../lib/to-upload'
 import React from 'preact/compat'
-import { useLocation, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import files, { getFiles } from '../lib/files'
+import Tag from './Tag'
+import humanSize from '../lib/human-size'
 
 function FilesToUpload() {
   return (
@@ -29,11 +31,12 @@ function FilesToUpload() {
           key={file.name}
         >
           <span>
-            {file.name} <span className="text-secondary">(10.3mb)</span>
+            {file.name} <Tag>{humanSize(file.size)}</Tag>
           </span>
           <button
             className={clsx(styles.removeButton, 'text-secondary')}
             onClick={() => removeFile(file)}
+            title="Remove"
           >
             <Remove width="18" />
           </button>
@@ -58,15 +61,17 @@ function Listing() {
 
   return (
     <>
-      <header className={styles.header}>blends/ (23 &bull; 1.35Gig)</header>
+      <header className={styles.header}>
+        blends/ <Tag>{folderListing.length} &bull; 1.35Gb</Tag>
+      </header>
       <div className="text-secondary">Drag files unto page to upload</div>
 
       {Boolean(toUpload.value.length) && <FilesToUpload />}
 
       <div className="mt-3">
-        {
-          folderListing.map((file) => (<FileItem file={file} />))
-        }
+        {folderListing.map((file) => (
+          <FileItem file={file} />
+        ))}
       </div>
     </>
   )

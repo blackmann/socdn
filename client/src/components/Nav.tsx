@@ -2,7 +2,8 @@ import React from 'preact/compat'
 import folders, { loadFolders } from '../lib/folders'
 import Add from '../svgs/Add'
 import styles from './Nav.module.css'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
+import clsx from 'clsx'
 
 function Nav() {
   React.useEffect(() => {
@@ -24,7 +25,14 @@ function Nav() {
       <ul className="ms-2">
         {folders.value.map((folder) => (
           <li key={folder.name}>
-            <Link to={folder.name}>{folder.name}</Link>
+            <NavLink
+              className={({ isActive }: { isActive: boolean }) =>
+                clsx({ [styles.active]: isActive })
+              }
+              to={folder.name}
+            >
+              {folder.name}
+            </NavLink>
           </li>
         ))}
       </ul>
