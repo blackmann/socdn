@@ -1,7 +1,7 @@
-import { F } from "./files";
+import { ENDPOINT } from "./requests"
 
-function getFileUrl(file: F, revision?: number) {
-  const parts = [import.meta.env.API_URL + '/_/' + file._id]
+function getFileUrl(folder: string, file: string, revision?: number) {
+  const parts = [ENDPOINT + '/_/' + folder + '/' + file]
   if (revision) {
     parts.push('revision=' + revision)
   }

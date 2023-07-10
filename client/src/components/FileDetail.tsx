@@ -9,7 +9,7 @@ import CopyLink from './CopyLink'
 import getFileUrl from '../lib/file-url'
 
 function FileDetail() {
-  const { fileId } = useParams()
+  const { fileId, folder } = useParams()
 
   React.useEffect(() => {
     loadFile(fileId!)
@@ -33,7 +33,7 @@ function FileDetail() {
           </span>
           <Tag className="mx-3 text-reset">{humanSize(file.size)}</Tag>
 
-          <CopyLink link={getFileUrl(file)} />
+          <CopyLink link={getFileUrl(folder!, file.name)} />
         </div>
 
         <h4>Revisions</h4>
@@ -51,7 +51,7 @@ function FileDetail() {
                   <Tag>{humanSize(revision.size)}</Tag>
                 </td>
                 <td>
-                  <CopyLink link={getFileUrl(file, revision.version)} />
+                  <CopyLink link={getFileUrl(folder!, file.name, revision.version)} />
                 </td>
               </tr>
             ))}

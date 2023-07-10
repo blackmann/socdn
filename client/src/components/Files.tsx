@@ -9,14 +9,31 @@ import { useParams } from 'react-router-dom'
 import files, { getFiles } from '../lib/files'
 import Tag from './Tag'
 import humanSize from '../lib/human-size'
+import req from '../lib/requests'
+
 
 function FilesToUpload() {
+  const { folder } = useParams()
+
+  async function uploadAll() {
+    const formData = new FormData()
+    for (const file of toUpload.value) {
+      formData.append('files', file)
+    }
+
+    await req.post('/files?folder='+ folder, formData)
+    clearFiles()
+
+    await getFiles(folder!)
+  }
+
   return (
     <div className={clsx('my-3 p-3', styles.uploadPreview)}>
       <header className="mb-3 d-flex align-items-center justify-content-between">
         <span className="text-accent">
           <Upload />
         </span>
+
         <span className={styles.toUploadTitle}>
           {toUpload.value.length} selected
         </span>
@@ -45,7 +62,7 @@ function FilesToUpload() {
 
       <footer className="mt-3 d-flex justify-content-end">
         <button onClick={() => clearFiles()}>Cancel</button>
-        <button className="primary">Upload all</button>
+        <button className="primary" onClick={uploadAll}>Upload all</button>
       </footer>
     </div>
   )
@@ -72,7 +89,7 @@ function Listing() {
 
       <div className="mt-3">
         {folderListing.map((file) => (
-          <FileItem file={file} />
+          <FileItem folder={folder!} file={file} />
         ))}
       </div>
     </>

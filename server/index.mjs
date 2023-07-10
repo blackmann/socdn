@@ -4,37 +4,40 @@ import * as mongodb from 'mongodb'
 import multer from 'multer'
 import path from 'path'
 import url from 'url'
+import onFinished from 'on-finished'
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
-const LOCAL_DB = 'mongodb://localhost:27017/socdn'
+const LOCAL_DB = 'mongodb://127.0.0.1:27017/socdn'
 
 const upload = multer({
   dest: './socdn_files',
   limits: { fileSize: 2_000_000_000 },
 })
+console.log('connecting to', process.env.MONGO_URL || LOCAL_DB)
 const client = new mongodb.MongoClient(process.env.MONGO_URL || LOCAL_DB)
 const db = client.db()
 
 const app = express()
 app.use(cors())
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   // logger
-  // doesn't work well for async callbacks
-  // TODO: Investigate
   const t = Date.now()
   const path = req.url
+
+  onFinished(res, () => {
+    const time = Date.now() - t
+
+    console.log(
+      `${res.statusCode} ${req.method.padEnd(7, ' ')} ${path.padEnd(
+        40,
+        ' '
+      )} ${time}ms`
+    )
+  })
+
   next()
-
-  const time = Date.now() - t
-
-  console.log(
-    `${res.statusCode} ${req.method.padEnd(7, ' ')} ${path.padEnd(
-      40,
-      ' '
-    )} ${time}ms`
-  )
 })
 
 app.use('/admin', express.static('./admin'))

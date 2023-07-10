@@ -8,10 +8,11 @@ import getFileUrl from '../lib/file-url'
 
 interface Props {
   file: F
+  folder: string
 }
 
-function FileItem({ file }: Props) {
-  const url = getFileUrl(file)
+function FileItem({ folder, file }: Props) {
+  const url = getFileUrl(folder, file.name)
 
   return (
     <div className={styles.fileItem}>
