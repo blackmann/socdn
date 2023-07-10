@@ -3,10 +3,7 @@ import cors from 'cors'
 import * as mongodb from 'mongodb'
 import multer from 'multer'
 import path from 'path'
-import url from 'url'
 import onFinished from 'on-finished'
-
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
 
 const LOCAL_DB = 'mongodb://127.0.0.1:27017/socdn'
 
@@ -14,7 +11,7 @@ const upload = multer({
   dest: './socdn_files',
   limits: { fileSize: 2_000_000_000 },
 })
-console.log('connecting to', process.env.MONGO_URL || LOCAL_DB)
+
 const client = new mongodb.MongoClient(process.env.MONGO_URL || LOCAL_DB)
 const db = client.db()
 

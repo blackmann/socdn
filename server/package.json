@@ -2,9 +2,11 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.mjs",
   "scripts": {
-    "start": "node index.mjs"
+    "dev": "node index.mjs",
+    "build": "node bundle.js",
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -15,5 +17,8 @@
     "mongodb": "^5.7.0",
     "multer": "^1.4.5-lts.1",
     "on-finished": "^2.4.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.18.11"
   }
 }

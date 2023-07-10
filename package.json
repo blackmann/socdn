@@ -6,9 +6,11 @@
   "main": "index.js",
   "scripts": {
     "dev:client": "yarn workspace client run dev",
-    "start:server": "yarn workspace server run start",
+    "dev:server": "yarn workspace server run dev",
     "build:client": "yarn workspace client run build",
-    "copy-client": "cp -R client/dist server/admin"
+    "build:server": "yarn workspace server run build",
+    "copy-client": "cp -R client/dist server/admin",
+    "start:server": "yarn workspace server run start"
   },
   "keywords": [],
   "workspaces": [
