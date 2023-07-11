@@ -12,6 +12,14 @@ docker build -t socdn:latest --build-arg api_url=http://localhost:3000
 
 The API URL should match where you host this project.
 
+MongoDB is required to run this project. When hosting, you need to supply the following env:
+
+```
+MONGO_URL=<mongodb URL> // you can use a free tier from Atlas
+```
+
+When testing locally using docker, you can set `MONGO_URL` as `mongodb://host.docker.internal:271017/socdn`; given that you have MongoDB locally installed.
+
 🌵 Supports file revisions too.
 
 ### Story time 📖
