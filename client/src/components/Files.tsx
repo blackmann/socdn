@@ -11,20 +11,24 @@ import Tag from './Tag'
 import humanSize from '../lib/human-size'
 import req from '../lib/requests'
 
-
 function FilesToUpload() {
   const { folder } = useParams()
+  const [uploading, setUploading] = React.useState(false)
 
   async function uploadAll() {
+    setUploading(true)
+
     const formData = new FormData()
     for (const file of toUpload.value) {
       formData.append('files', file)
     }
 
-    await req.post('/files?folder='+ folder, formData)
+    await req.post('/files?folder=' + folder, formData)
     clearFiles()
 
     await getFiles(folder!)
+
+    setUploading(false)
   }
 
   return (
@@ -62,7 +66,9 @@ function FilesToUpload() {
 
       <footer className="mt-3 d-flex justify-content-end">
         <button onClick={() => clearFiles()}>Cancel</button>
-        <button className="primary" onClick={uploadAll}>Upload all</button>
+        <button className="primary" disabled={uploading} onClick={uploadAll}>
+          {uploading ? 'Uploading...' : 'Upload all'}
+        </button>
       </footer>
     </div>
   )
@@ -81,7 +87,10 @@ function Listing() {
   return (
     <>
       <header className={styles.header}>
-        {folder}/ <Tag>{folderListing.length} &bull; {humanSize(size)}</Tag>
+        {folder}/{' '}
+        <Tag>
+          {folderListing.length} &bull; {humanSize(size)}
+        </Tag>
       </header>
       <div className="text-secondary">Drag files unto page to upload</div>
 
