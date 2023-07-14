@@ -13,8 +13,11 @@ import req from '../lib/requests'
 
 function FilesToUpload() {
   const { folder } = useParams()
+  const [uploading, setUploading] = React.useState(false)
 
   async function uploadAll() {
+    setUploading(true)
+
     const formData = new FormData()
     for (const file of toUpload.value) {
       formData.append('files', file)
@@ -24,6 +27,8 @@ function FilesToUpload() {
     clearFiles()
 
     await getFiles(folder!)
+
+    setUploading(false)
   }
 
   return (
@@ -61,8 +66,8 @@ function FilesToUpload() {
 
       <footer className="mt-3 d-flex justify-content-end">
         <button onClick={() => clearFiles()}>Cancel</button>
-        <button className="primary" onClick={uploadAll}>
-          Upload all
+        <button className="primary" disabled={uploading} onClick={uploadAll}>
+          {uploading ? 'Uploading...' : 'Upload all'}
         </button>
       </footer>
     </div>
