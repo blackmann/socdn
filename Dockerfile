@@ -10,7 +10,6 @@ RUN yarn build:server
 
 FROM node:16-alpine
 
-EXPOSE 3000
 WORKDIR /app
 COPY --from=build server/dist/index.js .
 COPY --from=build package.json .
