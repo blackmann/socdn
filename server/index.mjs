@@ -40,7 +40,7 @@ app.use(async (req, res, next) => {
 app.use('/admin', express.static('./admin'))
 
 app.get('/files', async (req, res) => {
-  const folder = checkForFolderName(req)
+  const folder = checkForFolderName(req, res)
   if (!folder) {
     return
   }
@@ -50,7 +50,7 @@ app.get('/files', async (req, res) => {
 })
 
 app.post('/files', upload.array('files'), async (req, res) => {
-  const folder = checkForFolderName(req)
+  const folder = checkForFolderName(req, res)
   if (!folder) {
     return
   }
@@ -77,7 +77,7 @@ app.post('/files', upload.array('files'), async (req, res) => {
         size: file.size,
       })
 
-      await revisionsCollection.insertOne({
+      const { insertedId: revisonId } = await revisionsCollection.insertOne({
         file: f.insertedId,
         filename: file.filename,
         version: 1,
@@ -85,7 +85,10 @@ app.post('/files', upload.array('files'), async (req, res) => {
         size: file.size,
       })
 
-      results.push(await filesCollection.findOne({ _id: f.insertedId }))
+      const revision = await revisionsCollection.findOne({ _id: revisonId })
+      const insertedFile = await filesCollection.findOne({ _id: f.insertedId })
+
+      results.push({ file: insertedFile, revision})
     } else {
       const f = await filesCollection.findOne({ name: file.originalname })
       await filesCollection.updateOne(
@@ -99,7 +102,7 @@ app.post('/files', upload.array('files'), async (req, res) => {
         .limit(1)
         .toArray()
 
-      await revisionsCollection.insertOne({
+      const { insertedId: revisionId } = await revisionsCollection.insertOne({
         file: f._id,
         filename: file.filename,
         version: previousRevision.version + 1,
@@ -107,7 +110,10 @@ app.post('/files', upload.array('files'), async (req, res) => {
         size: file.size,
       })
 
-      results.push(await filesCollection.findOne({ _id: f._id }))
+      const revision = await revisionsCollection.findOne({ _id: revisionId })
+      const insertedFile = await filesCollection.findOne({ _id: f._id })
+
+      results.push({ file: insertedFile, revision })
     }
   }
 
@@ -176,7 +182,7 @@ app.listen(port, () => {
   console.log('App serving at http://localhost:' + port)
 })
 
-function checkForFolderName(req) {
+function checkForFolderName(req, res) {
   const folder = req.query['folder']
 
   if (!folder) {

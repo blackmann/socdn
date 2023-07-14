@@ -1,3 +1,5 @@
 node_modules
 socdn_files
 dist
+sync.meta.json
+.husky

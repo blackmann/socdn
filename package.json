@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "dev:client": "yarn workspace client run dev",
+    "dev:cli": "yarn workspace cli run dev",
     "dev:server": "yarn workspace server run dev",
     "build:client": "yarn workspace client run build",
     "build:server": "yarn workspace server run build",
@@ -15,8 +16,9 @@
   "keywords": [],
   "workspaces": [
     "server",
-    "client"
+    "client",
+    "cli"
   ],
-  "author": "",
+  "author": "De-Great Yartey<degreat@live.co.uk>",
   "license": "ISC"
 }
