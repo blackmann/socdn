@@ -36,6 +36,18 @@ dokku storage:mount <app-name> /root/socdn_files:/app/socdn_files
 
 Here's a guide on how to do this with vanilla docker: https://docs.docker.com/storage/bind-mounts/#start-a-container-with-a-bind-mount
 
+Remember to set the `MONGO_URL` env variable. For dokku, you do:
+
+```sh
+dokku config:set <app-name> MONGO_URL="<mongo-url>"
+```
+
+Also set `api_url` build arg for dokku before deploying:
+
+```sh
+dokku docker-options:add <app-name> build '--build-arg api_url=<api-url-for-frontend>'
+```
+
 
 ### CLI
 

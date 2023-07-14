@@ -15,4 +15,7 @@ COPY --from=build server/dist/index.js .
 COPY --from=build package.json .
 COPY --from=build client/dist ./admin
 
+EXPOSE 5000
+ENV PORT=5000
+
 CMD ["node", "index.js"]
