@@ -14,7 +14,6 @@ const EMPTY_CONFIG = {
 }
 
 const destination = path.join(path.resolve('.'), 'sync.meta.json')
-const config = JSON.parse(fs.readFileSync(destination, { encoding: 'utf-8' }))
 
 function init() {
   if (!fs.existsSync(destination)) {
@@ -41,6 +40,7 @@ async function sync(download) {
 }
 
 async function syncDown() {
+  const config = getConfig()
   if (!config.versions) return
 
   const assetDirectoryIndex = {}
@@ -88,6 +88,7 @@ async function syncDown() {
 }
 
 async function syncUp() {
+  const config = getConfig()
   // each entry can be a string or `{path, remoteFolder}` object
   for (const assetDir of config.assetDirectories) {
     const { path: dir, remoteFolder } = parseDir(assetDir)
@@ -158,6 +159,15 @@ function parseDir(dir) {
 
 function md5(buf) {
   return crypto.createHash('md5').update(buf).digest('hex')
+}
+
+function getConfig() {
+  try {
+    return JSON.parse(fs.readFileSync(destination, { encoding: 'utf-8' }))
+  } catch (err) {
+    console.warn('Missing `sync.meta.json`. You need to run `socdn init` first!')
+    throw err
+  }
 }
 
 // App

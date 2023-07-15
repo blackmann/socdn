@@ -1,8 +1,9 @@
 {
-  "name": "@socdn/cli",
-  "version": "1.0.0",
+  "name": "@blackmann/socdn-cli",
+  "version": "1.0.2",
   "main": "index.js",
   "license": "MIT",
+  "repository": "https://github.com/blackmann/socdn",
   "dependencies": {
     "app-root-path": "^3.1.0",
     "axios": "^1.4.0",
