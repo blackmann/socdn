@@ -30,8 +30,8 @@ When using dokku, the command is:
 
 ```sh
 # running from /root
-mkdir socdn_files
-dokku storage:mount <app-name> /root/socdn_files:/app/socdn_files
+dokku storage:ensure-directory sodcn_files
+dokku storage:mount <app-name> /var/lib/dokku/data/storage/socdn_files:/app/socdn_files
 ```
 
 Here's a guide on how to do this with vanilla docker: https://docs.docker.com/storage/bind-mounts/#start-a-container-with-a-bind-mount
