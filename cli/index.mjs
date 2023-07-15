@@ -14,6 +14,7 @@ const EMPTY_CONFIG = {
 }
 
 const destination = path.join(path.resolve('.'), 'sync.meta.json')
+const config = JSON.parse(fs.readFileSync(destination, { encoding: 'utf-8' }))
 
 function init() {
   if (!fs.existsSync(destination)) {
@@ -27,16 +28,69 @@ function init() {
 
   husky.install()
   husky.add('.husky/pre-commit', 'npx socdn sync')
+  husky.add('.husky/post-merge', 'npx socdn sync --download')
 }
 
-async function sync() {
-  const config = JSON.parse(fs.readFileSync(destination, { encoding: 'utf-8' }))
+async function sync(download) {
+  if (download) {
+    await syncDown()
+    return
+  }
+
+  await syncUp()
+}
+
+async function syncDown() {
+  if (!config.versions) return
+
+  const assetDirectoryIndex = {}
+
+  for (const dir of config.assetDirectories) {
+    const entry = parseDir(dir)
+    assetDirectoryIndex[entry.path] = entry
+  }
+
+  for (const [dir, versions] of Object.entries(config.versions)) {
+    for (const version of versions) {
+      const filePath = path.join(path.resolve(dir), version.filename)
+
+      try {
+        const file = fs.readFileSync(filePath)
+        const hash = md5(file)
+
+        if (hash === version.md5) {
+          console.log('s:', dir, version.filename)
+          continue
+        }
+      } catch (err) {
+        //
+      }
+
+      // file doesn't exist or md5 mismatches, download
+      const dirEntry = assetDirectoryIndex[dir]
+
+      const fileUrl = [
+        config.server,
+        '_',
+        dirEntry.remoteFolder,
+        version.filename,
+      ].join('/')
+      const revisionQuery = '?revision=' + version.revision
+
+      const { data } = await axios.get(fileUrl + revisionQuery, {
+        responseType: 'stream',
+      })
+
+      data.pipe(fs.createWriteStream(filePath))
+      console.log('d:', dir, version.filename)
+    }
+  }
+}
+
+async function syncUp() {
   // each entry can be a string or `{path, remoteFolder}` object
   for (const assetDir of config.assetDirectories) {
-    const { path: dir, remoteFolder } =
-      typeof assetDir === 'object'
-        ? assetDir
-        : { path: assetDir, remoteFolder: 'general' }
+    const { path: dir, remoteFolder } = parseDir(assetDir)
 
     // [] each file version is in the format
     // { filename: <string>, md5: <string>, revision: <number> }
@@ -62,13 +116,14 @@ async function sync() {
 
       const filePath = path.join(path.resolve(dir), ent.name)
       const buf = fs.readFileSync(filePath)
-      const sum = crypto.createHash('md5').update(buf).digest('hex')
+      const sum = md5(buf)
 
       const existing = fileIndex[ent.name]
-      let revison = 1
+      let revision = 1
       if (!existing || sum != existing.md5) {
         const formData = new FormData()
         formData.append('files', await fileFromPath(filePath))
+        formData.append('hashes', JSON.stringify([sum]))
 
         const {
           data: [{ revision: uploadRevision }],
@@ -77,10 +132,14 @@ async function sync() {
           formData
         )
 
-        revison = uploadRevision.version
+        console.log('u:', dir, ent.name)
+
+        revision = uploadRevision.version
+      } else {
+        console.log('s:', dir, '/', ent.name)
       }
 
-      newVersions.push({ filename: ent.name, md5: sum, revison })
+      newVersions.push({ filename: ent.name, md5: sum, revision })
     }
 
     if (!config.versions) {
@@ -92,6 +151,17 @@ async function sync() {
 
   fs.writeFileSync(destination, JSON.stringify(config, null, 2))
 }
+
+function parseDir(dir) {
+  return typeof dir === 'object' ? dir : { path: dir, remoteFolder: 'general' }
+}
+
+function md5(buf) {
+  return crypto.createHash('md5').update(buf).digest('hex')
+}
+
+// App
+// --------
 
 const cli = meow(
   `socdn CLI
@@ -107,9 +177,13 @@ Commands
 Flags
 
   --help        Get this help
+  --download    When specified, will download files indicated in sync.meta.json. Else will upload.
 `,
   {
-    importMeta: import.meta
+    importMeta: import.meta,
+    flags: {
+      download: { type: 'boolean' },
+    },
   }
 )
 
@@ -122,7 +196,7 @@ switch (command) {
   }
 
   case 'sync': {
-    sync()
+    sync(cli.flags.download)
     break
   }
 

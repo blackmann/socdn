@@ -65,7 +65,9 @@ app.post('/files', upload.array('files'), async (req, res) => {
   const existing = Object.fromEntries(existingFiles.map((v) => [v.name, true]))
   const results = []
 
-  for (const file of req.files) {
+  // hashes length should be equal to files length
+  const hashes = JSON.parse(req.body['hashes']) || []
+  for (const [file, i] of indexed(req.files)) {
     if (!existing[file.originalname]) {
       // new file, create revision
       // inserting one-by-one is fine. it's not a public upload server
@@ -83,12 +85,13 @@ app.post('/files', upload.array('files'), async (req, res) => {
         version: 1,
         created_at: new Date(),
         size: file.size,
+        hash: hashes[i],
       })
 
       const revision = await revisionsCollection.findOne({ _id: revisonId })
       const insertedFile = await filesCollection.findOne({ _id: f.insertedId })
 
-      results.push({ file: insertedFile, revision})
+      results.push({ file: insertedFile, revision })
     } else {
       const f = await filesCollection.findOne({ name: file.originalname })
       await filesCollection.updateOne(
@@ -108,6 +111,7 @@ app.post('/files', upload.array('files'), async (req, res) => {
         version: previousRevision.version + 1,
         created_at: new Date(),
         size: file.size,
+        hash: hashes[i],
       })
 
       const revision = await revisionsCollection.findOne({ _id: revisionId })
@@ -172,7 +176,7 @@ app.get('/_/:folder/:fn', async (req, res) => {
   }
 
   res.sendFile(rev.filename, {
-    root: path.join(__dirname, 'socdn_files'),
+    root: path.join(path.resolve('.'), 'socdn_files'),
     headers: { 'Content-Disposition': 'attachment; file="' + file.name + '"' },
   })
 })
@@ -191,4 +195,12 @@ function checkForFolderName(req, res) {
   }
 
   return folder
+}
+
+function* indexed(arr) {
+  let i = 0
+  while (i < arr.length) {
+    yield [arr[i], i]
+    i++
+  }
 }
