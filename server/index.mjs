@@ -9,7 +9,7 @@ const LOCAL_DB = 'mongodb://127.0.0.1:27017/socdn'
 
 const upload = multer({
   dest: './socdn_files',
-  limits: { fileSize: 2_000_000_000 },
+  limits: { fileSize: 100_000_000 },
 })
 
 const client = new mongodb.MongoClient(process.env.MONGO_URL || LOCAL_DB)

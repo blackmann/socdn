@@ -48,6 +48,10 @@ Also set `api_url` build arg for dokku before deploying:
 dokku docker-options:add <app-name> build '--build-arg api_url=<api-url-for-frontend>'
 ```
 
+If you're using `nginx`, you'll need to increase file upload limit:
+
+https://stackoverflow.com/a/40890833/4803261
+
 
 ### CLI
 
